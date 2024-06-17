@@ -11,5 +11,5 @@ Common.print_menu({
 
 client = Common.get_database_client()
 today = date.today()
-execute_query(client.table("matches").select(""))
-st.dataframe(today)
+today_data = execute_query(client.table("matches").select("*").eq("date", today))
+st.dataframe(today_data)
