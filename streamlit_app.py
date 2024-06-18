@@ -146,6 +146,7 @@ standings = standings.style.apply(highlight_max, subset=['correct_home_goals', '
 
 st.dataframe(
     standings,
+    height=702,
     use_container_width=True, 
     hide_index=True,
 )
