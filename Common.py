@@ -41,32 +41,14 @@ def print_menu():
 
     # draw available pages
     with st.sidebar:
-
         st.page_link("streamlit_app.py", label="Dashboard", icon="🏠")
-        path = os.path.join(os.getcwd(), "pages")
+        st.page_link("pages/Predictions.py", label="Predictions", icon="🧠")
+        st.page_link("pages/Fixtures.py", label="Fixtures & Results", icon="⚽")
 
-        prev_type = ""
-        pages = os.listdir(path)
-        ordered_pages = sorted(pages)
-
-        for page in ordered_pages:
-            page_path = os.path.join(path, page)
-            page_type = page.split("_")[0]
-
-            # Skip the page if it's an exclude page
-            if page_type == "Exclude":
-                continue
-
-            page_name = page[len(page_type) + 1 : -3].replace("_", " ")
-            page_icon = get_first_emoji(page_name)
-            if page_icon:
-                page_name = page_name[len(page_icon) + 1 :]
-
-            if page_type != prev_type:
-                st.markdown(f"#### {page_type}")
-                prev_type = page_type
-
-            st.page_link(page_path, label=page_name, icon=page_icon)
+        # check if the user is an admin
+        if st.session_state.is_admin:
+            st.markdown("#### Administration")
+            st.page_link("pages/Admin_Update_Scores.py", label="Update match scores", icon="🧮")
 
 
 def get_first_emoji(text):
@@ -82,7 +64,7 @@ def get_first_emoji(text):
 st_supabase_client = st.connection(
     name = "euro-predictions",
     type = SupabaseConnection,
-    ttl = None
+    ttl = 300
 )
 
 def get_database_client():

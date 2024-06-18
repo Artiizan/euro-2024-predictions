@@ -4,7 +4,7 @@ import pandas as pd
 from st_supabase_connection import execute_query
 
 st.set_page_config(
-    page_title="Euro 2024 - Dashboard",
+    page_title="Fixtures & Results",
     page_icon="⚽",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -12,7 +12,7 @@ st.set_page_config(
 Common.print_menu()
 client = Common.get_database_client()
 
-st.header("⚽ Fixtures", divider="grey")
+st.header("⚽ Fixtures & Results", divider="blue")
 
 # Fetch the matches and display them in a DataFrame
 data = execute_query(client.table("matches").select(

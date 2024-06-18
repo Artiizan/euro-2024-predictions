@@ -4,7 +4,7 @@ from st_supabase_connection import execute_query
 import pandas as pd
 
 st.set_page_config(
-    page_title="Euro 2024 - Predictions",
+    page_title="Predictions",
     page_icon="🧠",
     layout="centered",
     initial_sidebar_state="expanded",
@@ -23,7 +23,7 @@ matches = execute_query(client.table("matches").select(
     "stage"
 ).order("number")).data
 
-st.header("🧠 Predictions", divider="grey")
+st.header("🧠 Predictions", divider="blue")
 
 # Fetch members with their IDs and names
 members_data = execute_query(client.table("members").select(

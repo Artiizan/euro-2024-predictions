@@ -1,5 +1,41 @@
-import Common
+import hmac
 import streamlit as st
+
+def check_password():
+    """Returns `True` if the user had the correct password."""
+
+    def password_entered():
+        """Checks whether a password entered by the user is correct."""
+        if hmac.compare_digest(st.session_state["password"], st.secrets["password"]):
+            st.session_state["password_correct"] = True
+            st.session_state["is_admin"] = False
+            del st.session_state["password"]  # Don't store the password.
+        elif hmac.compare_digest(st.session_state["password"], st.secrets["admin_password"]):
+            st.session_state["password_correct"] = True
+            st.session_state["is_admin"] = True
+            del st.session_state["password"]  # Don't store the password.
+        else:
+            st.session_state["is_admin"] = False
+            st.session_state["password_correct"] = False
+
+    # Return True if the password is validated.
+    if st.session_state.get("password_correct", False):
+        return True
+
+    # Show input for password.
+    st.text_input(
+        "Password", type="password", on_change=password_entered, key="password"
+    )
+    if "password_correct" in st.session_state:
+        st.error("😕 Password incorrect")
+    return False
+
+if not check_password():
+    st.stop()  # Do not continue if check_password is not True.
+
+# After passing authentication
+
+import Common
 from st_supabase_connection import execute_query
 from datetime import date
 import pandas as pd
@@ -44,7 +80,7 @@ today_df['stage'] = today_df.apply(lambda x: x['stage'] if pd.isna(x['group']) e
 st.dataframe(today_df, use_container_width=True, hide_index=True, column_order=['date', 'uk_time', 'home', 'score', 'away', 'stage', 'stadium'])
 
 # Standings
-st.subheader(":trophy: Prediction Standings", divider="grey")
+st.subheader(":trophy: Prediction Standings", divider="blue")
 
 # Fetch data from the database
 members = execute_query(client.table("members").select("id", "name").order("name")).data
