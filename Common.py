@@ -46,7 +46,7 @@ def print_menu():
         st.page_link("pages/Fixtures.py", label="Fixtures & Results", icon="⚽")
 
         # check if the user is an admin
-        if st.session_state.is_admin:
+        if "is_admin" in st.session_state and st.session_state.is_admin:
             st.markdown("#### Administration")
             st.page_link("pages/Admin_Update_Scores.py", label="Update match scores", icon="🧮")
 
@@ -69,3 +69,33 @@ st_supabase_client = st.connection(
 
 def get_database_client():
     return st_supabase_client
+
+import hmac
+def check_password():
+    """Returns `True` if the user had the correct password."""
+
+    def password_entered():
+        """Checks whether a password entered by the user is correct."""
+        if hmac.compare_digest(st.session_state["password"], st.secrets["password"]):
+            st.session_state["password_correct"] = True
+            st.session_state["is_admin"] = False
+            del st.session_state["password"]  # Don't store the password.
+        elif hmac.compare_digest(st.session_state["password"], st.secrets["admin_password"]):
+            st.session_state["password_correct"] = True
+            st.session_state["is_admin"] = True
+            del st.session_state["password"]  # Don't store the password.
+        else:
+            st.session_state["is_admin"] = False
+            st.session_state["password_correct"] = False
+
+    # Return True if the password is validated.
+    if st.session_state.get("password_correct", False):
+        return True
+
+    # Show input for password.
+    st.text_input(
+        "Password", type="password", on_change=password_entered, key="password"
+    )
+    if "password_correct" in st.session_state:
+        st.error("😕 Password incorrect")
+    return False

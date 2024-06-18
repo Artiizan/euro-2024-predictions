@@ -9,6 +9,7 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="expanded",
 )
+if not Common.check_password(): st.stop()
 Common.print_menu()
 client = Common.get_database_client()
 

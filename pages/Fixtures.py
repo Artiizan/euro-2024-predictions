@@ -9,6 +9,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+if not Common.check_password(): st.stop()
 Common.print_menu()
 client = Common.get_database_client()
 
@@ -52,7 +53,7 @@ styled_df = df.style.apply(highlight_cells, axis=1)
 st.dataframe(
     styled_df, 
     use_container_width=True, 
-    height=1000, 
+    height=900, 
     hide_index=True,
     column_order=['date', 'uk_time', 'home', 'score', 'away', 'stage', 'stadium']
 )
