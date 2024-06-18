@@ -82,6 +82,8 @@ for _, row in df.iterrows():
         standings.loc[standings['member'] == member, 'correct_away_goals'] += 1
     if (row['home_goals'] - row['away_goals']) * (row['home_goals_prediction'] - row['away_goals_prediction']) > 0:
         standings.loc[standings['member'] == member, 'correct_result'] += 1
+    if (row['home_goals'] == row['away_goals'] and row['home_goals_prediction'] == row['away_goals_prediction']):
+        standings.loc[standings['member'] == member, 'correct_result'] += 1
     if row['home_goals'] == row['home_goals_prediction'] and row['away_goals'] == row['away_goals_prediction']:
         standings.loc[standings['member'] == member, 'perfect_prediction'] += 1
 

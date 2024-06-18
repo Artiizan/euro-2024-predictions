@@ -83,7 +83,8 @@ def style_row(row):
 
     # If the correct winner is predicted
     if (row['home_goals'] > row['away_goals'] and row['home_goals_prediction'] > row['away_goals_prediction']) or \
-       (row['home_goals'] < row['away_goals'] and row['home_goals_prediction'] < row['away_goals_prediction']):
+       (row['home_goals'] < row['away_goals'] and row['home_goals_prediction'] < row['away_goals_prediction']) or \
+       (row['home_goals'] == row['away_goals'] and row['home_goals_prediction'] == row['away_goals_prediction']):
         styles[0] = 'background-color: green'  # number
         if row['home_goals'] == row['home_goals_prediction']:
             styles[1] = 'background-color: green'  # home
@@ -116,7 +117,7 @@ st.dataframe(
 st.markdown("""
 ### Key
 - <span style='color:orange'>**Orange row**</span>: The perfect score was predicted.
-- <span style='color:green'>**Green number**</span>: The correct winner was predicted.
+- <span style='color:green'>**Green number**</span>: The correct result was predicted.
 - <span style='color:green'>**Green home or away**</span>: The correct number of home or away goals was predicted.
-- <span style='color:red'>**Red number**</span>: The predicted winner was wrong.
+- <span style='color:red'>**Red number**</span>: The predicted result was wrong.
 """, unsafe_allow_html=True)
