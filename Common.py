@@ -11,9 +11,7 @@ logo_path = os.path.join(os.path.abspath(os.getcwd()), "resources", "logo.png")
 st_supabase_client = st.connection(
     name = "euro-predictions",
     type = SupabaseConnection,
-    ttl = None,
-    url = "https://ifyaynwerqyyfbghnvdk.supabase.co",
-    key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlmeWF5bndlcnF5eWZiZ2hudmRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTg2MzEzMzAsImV4cCI6MjAzNDIwNzMzMH0.NRibyWLw_3_G9JPz6lSQ1J9yC8iN0gUfJ3mI9gs6nQw"
+    ttl = None
 )
 
 EMOJI_PATTERN = re.compile(
@@ -28,13 +26,10 @@ EMOJI_PATTERN = re.compile(
 )
 
 
-def print_menu(page_config):
+def print_menu():
     """
     Prints the logo at the top of the Streamlit sidebar.
     """
-
-    # set the common page properties
-    st.set_page_config(**page_config)
 
     # set the logging level for the PIL logger,
     # as it's quite noisy with unuseful information

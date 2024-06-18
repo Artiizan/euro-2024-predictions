@@ -1,11 +1,5 @@
 import Common
 import streamlit as st
 
-Common.print_menu({
-    "layout": "wide",
-    "initial_sidebar_state": "expanded",
-})
+Common.print_menu()
 
-conn = Common.get_connection()
-standings = conn.read(worksheet="Standings")
-st.dataframe(standings)
