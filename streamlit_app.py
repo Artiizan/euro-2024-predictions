@@ -102,7 +102,7 @@ standings.loc[standings['position'] == 3, 'position'] = '🥉'
 # Highlight the highest score in each column in green
 def highlight_max(s):
     is_max = s == s.max()
-    return ['background-color: blue' if v else '' for v in is_max]
+    return ['background-color: green' if v else '' for v in is_max]
 
 standings = standings.style.apply(highlight_max, subset=['correct_home_goals', 'correct_away_goals', 'correct_result', 'perfect_prediction'])
 

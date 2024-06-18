@@ -7,3 +7,6 @@ showSidebarNavigation = false
 [server]
 enableCORS = false
 enableXsrfProtection = false
+
+[theme]
+base="dark"

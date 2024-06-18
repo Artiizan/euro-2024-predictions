@@ -79,7 +79,7 @@ def style_row(row):
 
     # If the perfect score is predicted
     if row['home_goals'] == row['home_goals_prediction'] and row['away_goals'] == row['away_goals_prediction']:
-        return ['background-color: blue'] * len(row)
+        return ['background-color: orange'] * len(row)
 
     # If the correct winner is predicted
     if (row['home_goals'] > row['away_goals'] and row['home_goals_prediction'] > row['away_goals_prediction']) or \
@@ -115,7 +115,7 @@ st.dataframe(
 # Add a section at the bottom of the webpage to explain the colorings and rules
 st.markdown("""
 ### Key
-- <span style='color:blue'>**Blue row**</span>: The perfect score was predicted.
+- <span style='color:orange'>**Orange row**</span>: The perfect score was predicted.
 - <span style='color:green'>**Green number**</span>: The correct winner was predicted.
 - <span style='color:green'>**Green home or away**</span>: The correct number of home or away goals was predicted.
 - <span style='color:red'>**Red number**</span>: The predicted winner was wrong.
