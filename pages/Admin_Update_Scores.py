@@ -60,7 +60,4 @@ with col2:
 # Button to update the scores
 if st.button("Update Scores", key="update_button", help="Click to update the scores", disabled=(home_score == "" and away_score == "")):
     execute_query(client.table("matches").update({"home_goals": home_score, "away_goals": away_score}).eq("number", selected_match_id))
-    selected_match_details['home_goals'] = home_score
-    selected_match_details['away_goals'] = away_score
-    st.experimental_rerun()
-    st.success("Scores updated successfully! 🎉 This may take up to 5 minutes to update on other pages due to local caching.")
+    st.success("Scores updated successfully! 🎉 This may take up to 5 minutes to update due to local caching.")
