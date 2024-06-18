@@ -7,13 +7,6 @@ from st_supabase_connection import SupabaseConnection
 
 logo_path = os.path.join(os.path.abspath(os.getcwd()), "resources", "logo.png")
 
-# Database
-st_supabase_client = st.connection(
-    name = "euro-predictions",
-    type = SupabaseConnection,
-    ttl = None
-)
-
 EMOJI_PATTERN = re.compile(
     "[\U0001F600-\U0001F64F]|[\U0001F300-\U0001F5FF]|"
     "[\U0001F680-\U0001F6FF]|[\U0001F700-\U0001F77F]|"
@@ -24,7 +17,6 @@ EMOJI_PATTERN = re.compile(
     "[\U0001F1E0-\U0001F1FF]+",
     flags=re.UNICODE,
 )
-
 
 def print_menu():
     """
@@ -50,7 +42,7 @@ def print_menu():
     # draw available pages
     with st.sidebar:
 
-        st.page_link("Home_Page.py", label="Dashboard", icon="🏠")
+        st.page_link("streamlit_app.py", label="Dashboard", icon="🏠")
         path = os.path.join(os.getcwd(), "pages")
 
         prev_type = ""
@@ -85,6 +77,13 @@ def get_first_emoji(text):
         return match.group()
     else:
         return None
+    
+# Database
+st_supabase_client = st.connection(
+    name = "euro-predictions",
+    type = SupabaseConnection,
+    ttl = None
+)
 
 def get_database_client():
     return st_supabase_client

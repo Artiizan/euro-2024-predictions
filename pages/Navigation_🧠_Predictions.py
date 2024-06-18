@@ -3,6 +3,12 @@ import streamlit as st
 from st_supabase_connection import execute_query
 import pandas as pd
 
+st.set_page_config(
+    page_title="Euro 2024 - Predictions",
+    page_icon="🧠",
+    layout="centered",
+    initial_sidebar_state="expanded",
+)
 Common.print_menu()
 client = Common.get_database_client()
 
@@ -12,8 +18,10 @@ matches = execute_query(client.table("matches").select(
     "home",
     "home_goals",
     "away",
-    "away_goals"
-)).data
+    "away_goals",
+    "group",
+    "stage"
+).order("number")).data
 
 st.header("🧠 Predictions", divider="grey")
 
@@ -50,7 +58,65 @@ joined_data = [
     if match["number"] == prediction["match_number"]
 ]
 df = pd.DataFrame(joined_data)
-# Filter out extra fields
-df = df[["number", "home", "home_goals_prediction", "away", "away_goals_prediction", "home_goals", "away_goals"]]
 
-st.dataframe(df, hide_index=True)
+# Set column data types
+df['home_goals'] = df['home_goals'].astype('Int64')
+df['away_goals'] = df['away_goals'].astype('Int64')
+df['actual_score'] = df.apply(lambda x: None if pd.isna(x['home_goals']) else str(x['home_goals']) + " : " + str(x['away_goals']), axis=1)
+df['home_goals_prediction'] = df['home_goals_prediction'].astype('Int64')
+df['away_goals_prediction'] = df['away_goals_prediction'].astype('Int64')
+df['predicted_score'] = df.apply(lambda x: None if pd.isna(x['home_goals_prediction']) else str(x['home_goals_prediction']) + " : " + str(x['away_goals_prediction']), axis=1)
+df['stage'] = df.apply(lambda x: x['stage'] if pd.isna(x['group']) else f"{x['stage']} {x['group']}", axis=1)
+
+# Styling the dataframe
+def style_row(row):
+    # Default styles
+    styles = [''] * len(row)
+
+    # If the game hasn't been played yet
+    if pd.isna(row['home_goals']):
+        return styles
+
+    # If the perfect score is predicted
+    if row['home_goals'] == row['home_goals_prediction'] and row['away_goals'] == row['away_goals_prediction']:
+        return ['background-color: blue'] * len(row)
+
+    # If the correct winner is predicted
+    if (row['home_goals'] > row['away_goals'] and row['home_goals_prediction'] > row['away_goals_prediction']) or \
+       (row['home_goals'] < row['away_goals'] and row['home_goals_prediction'] < row['away_goals_prediction']):
+        styles[0] = 'background-color: green'  # number
+        if row['home_goals'] == row['home_goals_prediction']:
+            styles[1] = 'background-color: green'  # home
+            styles[2] = 'background-color: green'  # predicted_score
+        if row['away_goals'] == row['away_goals_prediction']:
+            styles[3] = 'background-color: green'  # away
+            styles[2] = 'background-color: green'  # predicted_score
+    else:
+        styles[0] = 'background-color: red'  # number
+        if row['home_goals'] == row['home_goals_prediction']:
+            styles[1] = 'background-color: green'  # home
+            styles[2] = 'background-color: green'  # predicted_score
+        if row['away_goals'] == row['away_goals_prediction']:
+            styles[3] = 'background-color: green'  # away
+            styles[2] = 'background-color: green'  # predicted_score
+
+    return styles
+
+styled_df = df.style.apply(style_row, axis=1)
+
+st.dataframe(
+    styled_df,
+    use_container_width=True,
+    height=800, 
+    hide_index=True,
+    column_order=['number', 'home', 'predicted_score', 'away', 'actual_score']
+)
+
+# Add a section at the bottom of the webpage to explain the colorings and rules
+st.markdown("""
+### Key
+- <span style='color:blue'>**Blue row**</span>: The perfect score was predicted.
+- <span style='color:green'>**Green number**</span>: The correct winner was predicted.
+- <span style='color:green'>**Green home or away**</span>: The correct number of home or away goals was predicted.
+- <span style='color:red'>**Red number**</span>: The predicted winner was wrong.
+""", unsafe_allow_html=True)

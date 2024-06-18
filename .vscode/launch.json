@@ -11,12 +11,11 @@
             "module": "streamlit",
             "env": {
                 // any .env variables you may have
-                "STREAMLIT_APP": "Home_Page.py",
                 "STREAMLIT_ENV": "development",
             },
             "args": [
                 "run",
-                "Home_Page.py"
+                "streamlit_app.py"
             ],
             "jinja": true,
             "justMyCode": true
