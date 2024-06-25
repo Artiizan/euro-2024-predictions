@@ -1,8 +1,8 @@
-from pathlib import Path
-import logging
 import os
 import re
+import logging
 import streamlit as st
+from pathlib import Path
 from st_supabase_connection import SupabaseConnection
 
 logo_path = os.path.join(os.path.abspath(os.getcwd()), "resources", "logo.png")
@@ -59,16 +59,6 @@ def get_first_emoji(text):
         return match.group()
     else:
         return None
-    
-# Database
-st_supabase_client = st.connection(
-    name = "euro-predictions",
-    type = SupabaseConnection,
-    ttl = 300
-)
-
-def get_database_client():
-    return st_supabase_client
 
 import hmac
 def check_password():
@@ -99,3 +89,13 @@ def check_password():
     if "password_correct" in st.session_state:
         st.error("😕 Password incorrect")
     return False
+
+# Database
+st_supabase_client = st.connection(
+    name = "euro-predictions",
+    type = SupabaseConnection,
+    ttl = 300
+)
+
+def get_database_client():
+    return st_supabase_client

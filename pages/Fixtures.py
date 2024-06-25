@@ -16,6 +16,7 @@ client = Common.get_database_client()
 st.header("⚽ Fixtures & Results", divider="blue")
 
 # Fetch the matches and display them in a DataFrame
+
 data = execute_query(client.table("matches").select(
     "number",
     "date",
