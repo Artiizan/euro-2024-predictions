@@ -14,6 +14,7 @@ st.set_page_config(
 if not Common.check_password(): st.stop()
 Common.print_menu()
 client = Common.get_database_client()
+today = date.today()
 
 ####################################################################################################
 # Database
@@ -21,7 +22,6 @@ client = Common.get_database_client()
 
 @st.cache_data(ttl=300)
 def get_todays_matches():
-    today = date.today()
     today_data = execute_query(client.table("matches").select(
         "date",
         "time",
@@ -59,21 +59,45 @@ st.dataframe(today_df, use_container_width=True, hide_index=True, column_order=[
 st.subheader(":trophy: Prediction Standings", divider="blue")
 standings = Database.get_standings()
 
+# Get knockout round points
+knockout_round_points = Database.get_knockout_round_points()
+standings = standings.merge(knockout_round_points, on='member_id', how='left')
+
+# Get the total points
+member_standings = Database.get_standings_totals(standings)
+
 ### Styling
 # Highlight the highest score in each column in green
 def highlight_max(s):
+    if pd.isna(s).all() or s.max() == 0:
+        return ['' for _ in s]
     is_max = s == s.max()
     return ['background-color: green' if v else '' for v in is_max]
 
 # Add medals
-standings.loc[standings['position'] == 1, 'position'] = '🥇'
-standings.loc[standings['position'] == 2, 'position'] = '🥈'
-standings.loc[standings['position'] == 3, 'position'] = '🥉'
+member_standings.loc[member_standings['position'] == 1, 'position'] = '🥇'
+member_standings.loc[member_standings['position'] == 2, 'position'] = '🥈'
+member_standings.loc[member_standings['position'] == 3, 'position'] = '🥉'
 
-standings = standings.style.apply(highlight_max, subset=['group_goals', 'group_result', 'group_perfect'])
+# Only show the knockout round columns if the tournament has reached that stage
+if today < date(2024, 6, 30):
+    # Hide the quarter finals, semifinals and finals columns if the tournament has not reached that stage
+    member_standings = member_standings[[ 'position', 'name', 'group_goals', 'group_result', 'group_perfect', 'round_of_16', 'total' ]]
+    member_standings = member_standings.style.apply(highlight_max, subset=['group_goals', 'group_result', 'group_perfect', 'round_of_16'])
+elif today < date(2024, 7, 3):
+    # Hide the semifinals and finals columns if the tournament has not reached that stage
+    member_standings = member_standings[[ 'position', 'name', 'group_goals', 'group_result', 'group_perfect', 'round_of_16', 'quarter_finals', 'total' ]]
+    member_standings = member_standings.style.apply(highlight_max, subset=['group_goals', 'group_result', 'group_perfect', 'round_of_16', 'quarter_finals'])
+elif today < date(2024, 7, 6):
+    # Hide the finals column if the tournament has not reached that stage
+    member_standings = member_standings[[ 'position', 'name', 'group_goals', 'group_result', 'group_perfect', 'round_of_16', 'quarter_finals', 'semi_finals', 'total' ]]
+    member_standings = member_standings.style.apply(highlight_max, subset=['group_goals', 'group_result', 'group_perfect', 'round_of_16', 'quarter_finals', 'semi_finals'])
+else:
+    # Show all columns
+    member_standings = member_standings.style.apply(highlight_max, subset=['group_goals', 'group_result', 'group_perfect', 'round_of_16', 'quarter_finals', 'semi_finals', 'finals', 'total'])
 
 st.dataframe(
-    standings,
+    member_standings,
     height=702,
     use_container_width=True, 
     hide_index=True,

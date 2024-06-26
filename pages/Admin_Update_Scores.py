@@ -30,6 +30,7 @@ def get_played_matches():
         "home_goals",
         "away_goals",
         "stage",
+        "next_game"
     ).order("number")).data
 
     data = [match for match in data if match["date"] <= str(today)] # Filter out matches that haven't happened yet
@@ -71,11 +72,22 @@ with col1:
 with col2:
     away_score = st.text_input(f"{selected_match_details['away']} ", placeholder=f"{selected_match_details['away_goals']}")
 
+# Allow user to add penalties if the match is a draw after the group stage
+home_penalties = None
+away_penalties = None
+if selected_match_details["stage"] != "Group" and home_score == away_score:
+    col3, col4 = st.columns(2)
+    with col3:
+        home_penalties = st.text_input(f"{selected_match_details['home']} Penalties", placeholder="0")
+    with col4:
+        away_penalties = st.text_input(f"{selected_match_details['away']} Penalties", placeholder="0")
+
 # Button to update the scores
 if st.button("Update Scores", key="update_button", help="Click to update the scores", disabled=(home_score == "" and away_score == "")):
     execute_query(client.table("matches").update({"home_goals": home_score, "away_goals": away_score}).eq("number", selected_match_id))
-    if selected_match_details["stage"] == "Group":
-        Database.update_standings(selected_match_details["stage"])
+    if selected_match_details["stage"] != "Group" and home_penalties != "" and away_penalties != "":
+        execute_query(client.table("matches").update({"home_penalties": home_penalties, "away_penalties": away_penalties}).eq("number", selected_match_id))
+    Database.update_standings(selected_match_details["stage"], selected_match_details["home"], selected_match_details["away"], home_score, away_score, home_penalties, away_penalties, selected_match_details["next_game"])
     st.cache_data.clear()
     st.cache_resource.clear()
     st.success("Scores updated successfully! 🎉")

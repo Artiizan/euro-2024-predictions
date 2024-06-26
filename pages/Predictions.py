@@ -6,7 +6,7 @@ import pandas as pd
 st.set_page_config(
     page_title="Predictions",
     page_icon="🧠",
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="expanded",
 )
 if not Common.check_password(): st.stop()
@@ -28,7 +28,7 @@ st.header("🧠 Predictions", divider="blue")
 
 # Fetch members with their IDs and names
 members_data = execute_query(client.table("members").select(
-    "id", "name"
+    "id", "name", "winning_country"
 ).order("name")).data
 
 # Create a dictionary mapping member names to their IDs
@@ -48,6 +48,8 @@ data = execute_query(client.table("predictions").select(
     "match_number",
     "home_goals_prediction",
     "away_goals_prediction",
+    "home_team_prediction",
+    "away_team_prediction"
 ).eq("member_id", selected_member_id)
 .order("match_number")).data
 
@@ -74,13 +76,22 @@ def style_row(row):
     # Default styles
     styles = [''] * len(row)
 
+    # If the correct home_team_prediction is predicted
+    if row['home'] == row['home_team_prediction']:
+        styles[10] = 'background-color: green'  # home_team_prediction
+    
+    # If the correct away_team_prediction is predicted
+    if row['away'] == row['away_team_prediction']:
+        styles[11] = 'background-color: green'  # away_team_prediction
+
+    # If both teams are predicted correctly
+    if row['home'] == row['home_team_prediction'] and row['away'] == row['away_team_prediction']:
+        styles[10] = 'background-color: orange'  # home_team_prediction
+        styles[11] = 'background-color: orange'  # away_team_prediction
+
     # If the game hasn't been played yet
     if pd.isna(row['home_goals']):
         return styles
-
-    # If the perfect score is predicted
-    if row['home_goals'] == row['home_goals_prediction'] and row['away_goals'] == row['away_goals_prediction']:
-        return ['background-color: orange'] * len(row)
 
     # If the correct winner is predicted
     if (row['home_goals'] > row['away_goals'] and row['home_goals_prediction'] > row['away_goals_prediction']) or \
@@ -102,6 +113,12 @@ def style_row(row):
             styles[3] = 'background-color: green'  # away
             styles[2] = 'background-color: green'  # predicted_score
 
+    # If the perfect score is predicted
+    if row['home_goals'] == row['home_goals_prediction'] and row['away_goals'] == row['away_goals_prediction']:
+        styles[0] = 'background-color: orange'  # number
+        styles[1] = 'background-color: orange'  # home
+        styles[3] = 'background-color: orange'  # away
+
     return styles
 
 styled_df = df.style.apply(style_row, axis=1)
@@ -111,14 +128,15 @@ st.dataframe(
     use_container_width=True,
     height=800, 
     hide_index=True,
-    column_order=['number', 'home', 'predicted_score', 'away', 'actual_score']
+    column_order=['number', 'home', 'away', 'actual_score', 'predicted_score', 'home_team_prediction', 'away_team_prediction']
 )
 
 # Add a section at the bottom of the webpage to explain the colorings and rules
 st.markdown("""
 ### Key
-- <span style='color:orange'>**Orange row**</span>: The perfect score was predicted.
+- <span style='color:orange'>**Orange row**</span>: The perfect score was predicted | You predicted the correct home and away teams for this match.
 - <span style='color:green'>**Green number**</span>: The correct result was predicted.
 - <span style='color:green'>**Green home or away**</span>: The correct number of home or away goals was predicted.
+- <span style='color:green'>**Green predicted team**</span>: The correct team was predicted for this match.
 - <span style='color:red'>**Red number**</span>: The predicted result was wrong.
 """, unsafe_allow_html=True)
