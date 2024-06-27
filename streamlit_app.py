@@ -47,13 +47,16 @@ st.subheader("Welcome to the Williams Euro predictions tracker", divider="rainbo
 st.subheader(":calendar: Today's Matches", divider="grey")
 
 today_df = get_todays_matches()
-today_df['home_goals'] = today_df['home_goals'].astype('Int64')
-today_df['away_goals'] = today_df['away_goals'].astype('Int64')
-today_df['score'] = today_df.apply(lambda x: None if pd.isna(x['home_goals']) else str(x['home_goals']) + " : " + str(x['away_goals']), axis=1)
-today_df['date'] = pd.to_datetime(today_df['date']).dt.strftime('%d %B')
-today_df['uk_time'] = pd.to_datetime(today_df['time'], format="mixed").dt.strftime('%H:%M')
-today_df['stage'] = today_df.apply(lambda x: x['stage'] if pd.isna(x['group']) else f"{x['stage']} {x['group']}", axis=1)
-st.dataframe(today_df, use_container_width=True, hide_index=True, column_order=['date', 'uk_time', 'home', 'score', 'away', 'stage', 'stadium'])
+if today_df.empty:
+    st.markdown("<h3 style='text-align: center;'><em>There are no matches scheduled for today</em> 😢</h3>", unsafe_allow_html=True)
+else:
+    today_df['home_goals'] = today_df['home_goals'].astype('Int64')
+    today_df['away_goals'] = today_df['away_goals'].astype('Int64')
+    today_df['score'] = today_df.apply(lambda x: None if pd.isna(x['home_goals']) else str(x['home_goals']) + " : " + str(x['away_goals']), axis=1)
+    today_df['date'] = pd.to_datetime(today_df['date']).dt.strftime('%d %B')
+    today_df['uk_time'] = pd.to_datetime(today_df['time'], format="mixed").dt.strftime('%H:%M')
+    today_df['stage'] = today_df.apply(lambda x: x['stage'] if pd.isna(x['group']) else f"{x['stage']} {x['group']}", axis=1)
+    st.dataframe(today_df, use_container_width=True, hide_index=True, column_order=['date', 'uk_time', 'home', 'score', 'away', 'stage', 'stadium'])
 
 # Standings
 st.subheader(":trophy: Prediction Standings", divider="blue")
