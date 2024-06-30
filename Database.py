@@ -94,9 +94,9 @@ def update_standings(stage, home, away, home_goals, away_goals, home_penalties=N
 
         # Update the next match with the winner
         if next_game.split("-")[1] == 'home':
-            execute_query(client.table("matches").update(next_match_number, {"home": winner}))
+            execute_query(client.table("matches").update({"home": winner}).eq("number", next_match_number))
         if next_game.split("-")[1] == 'away':
-            execute_query(client.table("matches").update(next_match_number, {"away": winner}))
+            execute_query(client.table("matches").update({"away": winner}).eq("number", next_match_number))
 
     if stage == 'Final':
         # Workout the match winner
